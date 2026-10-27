@@ -1,0 +1,29 @@
+FAIL bf6-meta.json: a player's name ...  path exists on this PC. Weapon table is not from Nick's matches.", "reasoned": "Tiers copied fr
+FAIL cp77-mods.json: a player's locker ... fixes", "ApartmentToys", "AppearanceChangeUnlocker", "AppearanceMenuMod", "auto_drive_en
+FAIL gzw-field-notes.json: a player's name ...  devlogs, press previews, one community guide and Nick's game screen of 23 Oct 2026; each hideout ca
+FAIL gzw-field-notes.json: a player's locker ... that predates the 8-minute extension.", "regen_blocker": "Blood does not naturally regenerate whil
+FAIL gzw-hideout.json: a player's name ... zon); four Workshop stations were checked against Nick's own in-game hideout screens recorded 23 Oct
+FAIL gzw-hideout.json: a player's locker ... gest pack you own.", "src": "Nick's vendor and locker screenshots, 23 Oct 2026" }, "A": { 
+FAIL gzw-hideout.json: games-center's personal data files or keys ... vlogs. The vendor plan reads Nick's standing from gzw-progress.json and rank costs from gzw-field-no
+FAIL gzw-hideout.json: a link into games-center's /gzw pages ... ing Parts", "Motor Oil" ], "map": "/gzw/map?v=111.40,60.44,9.00", "guess": fals
+FAIL gzw-hideout.json: the old personal kit card ... shed safe yet.", "kits": { "light": { "t": "Your current kit", "d": "AK-12 with the red dot
+FAIL gzw-map-missions.json: a player's locker ... ll","v":"Artisan","o":"Take the package from your locker and deliver it to a box by a house on the w
+FAIL gzw-progress.json: a player's name ... cs > Tasks screen, Task Progress Per Vendor, from Nick's screenshot of 2026-10-23 18:42 (game 0.5.0.
+FAIL gzw-progress.json: a player's locker ... pparel, vendor levels, statistics", "wipes": "locker and money", "note": "On first entering 
+FAIL gzw-task-pins.json: a player's locker ... src":"tacmap","sid":3496},{"n":"John Carmillion's Locker Key","gx":17.189,"gy":16.482,"k":"task","ta
+FAIL ron-killcam-research.json: a player's locker ... of the four camera-adjacent mods found (Console Unlocker, TPS CAM) were last updated well before tha
+FAIL ron-missions-research.json: a player's locker ... hrough the west rear side entrance near the staff locker room.","loadout":{"primary":"A flexible mid
+FAIL ron-mod-control.json: a player's name ... ame": "ready-or-not", "profile": "Ready or Not · Nick profile", "freshness": [ { "id": "ron-i
+FAIL scrape\allimages.json: a player's locker ... atest?cb=20250621131253"},{"t":"John_Carmillion's_Locker_Key_Spawn.png","u":"https://static.wikia.no
+FAIL scrape\ron-missions\Elephant.json: a player's locker ... ing. Antidepressants can be found in the evidence locker once the mission is complete. It mentions t
+FAIL scrape\ron-missions\Greased-Palms.json: a player's locker ... ou'll be bagging and tagging evidence down in the lockers for the rest of your time with the LSPD.''
+FAIL scrape\ron-missions\Ides-of-March.json: a player's locker ... litary weapons.\n* Evidence found in the Evidence Locker suggest the Left Behind were possibly aided
+FAIL scrape\ron-missions\Relapse.json: a player's locker ...  through the West rear side entrance by the staff locker room. You've all been sent plans to the hos
+FAIL scrape\ron-missions\Thank-You-Come-Again.json: a player's locker ... mployee break room. Andre’s Notes in the evidence locker reveal that this teenager had his arm broke
+FAIL scrape\ron-missions\The-Spider.json: a player's locker ...  the store is a hallway which leads to storage, a locker room and toilets, through which, the courty
+FAIL scrape\tacmap-raw.json: a player's locker ... : 1, "id": 3497, "name": "John Carmillion's Locker Key", "icon": "_locked", "lat": 6508.
+FAIL search-index.json: a player's locker ... eta":"other"},{"kind":"mod","title":"Photo Mode Unlocker 2.3 XL","route":"/cp77/mods","game":"cp77",
+FAIL search-index.json: a link into games-center's /gzw pages ... zw"},{"kind":"page","title":"Field guide","route":"/gzw/field","game":"gzw","meta":"/gzw/field"},{"k
+FAIL updates.json: games-center's personal data files or keys ...  }, { "kind": "new", "file": "gzw-field-notes.json", "route": null, 
+FAIL updates.json: a link into games-center's /gzw pages ...  "file": "gzw-map-missions.json", "route": "/gzw/map", "headline": "gzw-map-missions.js
+90 files read, 28 problems

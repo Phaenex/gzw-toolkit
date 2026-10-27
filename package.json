@@ -1,0 +1,15 @@
+{
+  "name": "gzw-toolkit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Gray Zone Warfare 0.5 player tools: hideout runs, loadout builder, carry weight, loot values. Static site; visitor data stays in the browser.",
+  "scripts": {
+    "sync": "node scripts/sync.mjs",
+    "sync:rescrape": "node scripts/sync.mjs --rescrape",
+    "check:clean": "node scripts/check-clean.mjs",
+    "serve": "node scripts/serve.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.63.0"
+  }
+}

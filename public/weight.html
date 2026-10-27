@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<meta name="description" content="Gray Zone Warfare 0.5 carry weight: your loadout plus what you plan to bring out, against the 54 kg encumbrance limit. Hideout and disassembly materials with wiki sizes and weights.">
+<title>Carry weight</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/site.css">
+<style>
+.bar{position:relative;height:30px;border:1px solid var(--line-hard);background:var(--sunk);margin:26px 0 30px;max-width:900px}
+.bar .fill{position:absolute;left:0;top:0;bottom:0;background:var(--go)}
+.bar .fill.over{background:var(--rust)}
+.bar .fill.carry{background:var(--amber)}
+.bar .mk{position:absolute;top:-22px;bottom:-22px;border-left:2px solid var(--ink);font-family:"JetBrains Mono",monospace;font-size:.68rem;padding-left:4px;color:var(--ink);white-space:nowrap}
+.bar .mk.soft{border-left:1px dashed var(--faint);color:var(--faint)}
+.bar .mk span{position:absolute;top:0}
+.bar .mk em{position:absolute;bottom:0;font-style:normal}
+.big{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:10px;margin:0 0 6px;max-width:900px}
+.big div{border:1px solid var(--line);background:var(--raised);padding:8px 12px}
+.big b{display:block;font-family:"JetBrains Mono",monospace;font-size:1.1rem}
+.big span{font-size:.72rem;color:var(--soft);text-transform:uppercase;letter-spacing:.06em;font-family:Oswald,sans-serif}
+.verdict{font-family:Oswald,sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:1rem;margin:8px 0}
+.verdict.over{color:var(--rust)}.verdict.ok{color:var(--go)}
+td .pic{width:40px;height:30px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.chips button[aria-pressed=true]{background:var(--amber);color:var(--on-mark);border-color:var(--amber)}
+input.q{width:64px}
+#pickList{max-height:340px;overflow:auto}
+</style>
+<script src="/store.js"></script>
+</head>
+<body>
+<main id="main">
+<h1>Carry weight</h1>
+<p class="lede">What you wear plus what you plan to bring out, against the one weight limit the game enforces. Sizes and weights are each item's wiki infobox.</p>
+
+<section id="sum">
+<h2><span class="num">01</span> Total</h2>
+<div class="row"><label for="src">Loadout</label><select id="src"></select> <a href="/loadout">Edit loadouts</a></div>
+<div class="big" id="big"></div>
+<p class="verdict" id="verdict"></p>
+<div class="bar" id="bar" role="img"></div>
+<p id="gateText"></p>
+<p class="dim" id="softText"></p>
+</section>
+
+<section id="bagSec">
+<h2><span class="num">02</span> What you plan to carry out</h2>
+<div class="tscroll"><table class="std">
+  <thead><tr><th></th><th>Item</th><th>Size</th><th class="r">Each</th><th>Qty</th><th class="r">Weight</th><th class="r">Slots</th><th></th></tr></thead>
+  <tbody id="bagRows"></tbody>
+</table></div>
+<div class="row"><button type="button" id="clearBag">Empty the bag</button><span class="dim" id="slotNote"></span></div>
+<h3>Add to the bag</h3>
+<div class="chips" id="chips"></div>
+<div class="row"><label for="q">Search</label><input id="q" type="search" placeholder="Steel, Dynamo, jewellery..."></div>
+<div class="tscroll" id="pickList"><table class="std">
+  <thead><tr><th></th><th>Item</th><th>Kind</th><th>Size</th><th class="r">kg</th><th></th></tr></thead>
+  <tbody id="pickRows"></tbody>
+</table></div>
+</section>
+<script src="/site.js"></script>
+<script>
+(function(){
+"use strict";
+var $=Site.$,esc=Site.esc,ext=Site.ext,cat="Building Material";
+var q=new URLSearchParams(location.search);
+Promise.all([Site.getJSON("/data/items.json"),Site.getJSON("/data/loot.json"),Site.getJSON("/data/weight.json"),Site.getJSON("/data/hideout.json")]).then(function(a){
+  var D=a[0],L=a[1],W=a[2],H=a[3],IT={},LI={};
+  D.items.forEach(function(i){IT[i.id]=i;});L.items.forEach(function(i){LI[i.id]=i;});
+  var norm=function(s){return String(s).toLowerCase().replace(/[^a-z0-9]/g,"");};
+  var byName={};L.items.forEach(function(i){byName[norm(i.name)]=i;});
+  /* ?run=<id> from the hideout page: put that run's materials in the bag */
+  var run=q.get("run")&&H.runs.filter(function(r){return r.id===q.get("run");})[0];
+  if(run)GZK.change(function(s){run.bag.forEach(function(b){var it=byName[norm(b.m)];if(it&&!s.bag.some(function(x){return x.id===it.id;}))s.bag.push({id:it.id,n:1});});});
+  var chosen=q.get("l")||"draft";
+  $("gateText").innerHTML=esc(W.gateText)+" "+ext(W.gateSrc,"Wiki: Health system");
+  $("softText").textContent="Dashed lines: "+W.soft.map(function(t){return t.l+" "+t.a+"-"+t.b+" kg ("+t.s.toLowerCase()+")";}).join("; ")+". "+W.softText;
+  var CATS=["Building Material","Disassembly Material","Laboratory Supplies","Workshop Supplies","Electronics","Jewellery","Vices","Funds","Evidence","Military Equipment","Military Material","Household Item","Tool","All"];
+  $("chips").innerHTML=CATS.map(function(c){return '<button type="button" aria-pressed="'+(c===cat)+'" data-c="'+esc(c)+'">'+esc(c)+'</button>';}).join("");
+  function loadout(){
+    var s=GZK.get();if(chosen==="draft")return s.draft;
+    return s.loadouts.filter(function(l){return l.id===chosen;})[0]||s.draft;
+  }
+  function drawSrc(){
+    var s=GZK.get();
+    if(chosen!=="draft"&&!s.loadouts.some(function(l){return l.id===chosen;}))chosen="draft";
+    $("src").innerHTML='<option value="draft">The one open in the builder</option>'+s.loadouts.map(function(l){return '<option value="'+esc(l.id)+'"'+(l.id===chosen?" selected":"")+'>'+esc(l.name)+'</option>';}).join("");
+  }
+  function draw(){
+    var s=GZK.get(),l=loadout(),worn=0,slotsHave=0,missing=[];
+    ["weapon","vest","helmet","rig","backpack"].forEach(function(k){var it=l[k]&&IT[l[k]];if(it){if(it.weight!=null)worn+=it.weight;else missing.push(it.name);if(k!=="weapon"&&it.slots)slotsHave+=it.slots;}});
+    var am=l.ammo&&IT[l.ammo];if(am)worn+=(am.weight||0)*(l.ammoN||0);
+    var carry=0,slotsUsed=0,unk=[];
+    $("bagRows").innerHTML=s.bag.length?s.bag.map(function(b,i){var it=LI[b.id];if(!it)return "";
+      var w=it.weight!=null?it.weight*b.n:null;if(w!=null)carry+=w;else unk.push(it.name);slotsUsed+=(it.slots||0)*b.n;
+      return '<tr><td>'+Site.pic(it)+'</td><td>'+ext(it.page,it.name)+'</td><td class="mono">'+esc(it.size||"-")+'</td><td class="r mono">'+Site.kg(it.weight)+'</td><td><input class="q" type="number" min="1" max="99" value="'+b.n+'" data-i="'+i+'" aria-label="Quantity of '+esc(it.name)+'"></td><td class="r mono">'+Site.kg(w)+'</td><td class="r mono">'+((it.slots||0)*b.n)+'</td><td><button type="button" data-rm="'+i+'" aria-label="Remove '+esc(it.name)+'">Remove</button></td></tr>';}).join(""):'<tr><td colspan="8" class="dim">Nothing yet. Add materials below, or press "weigh it" on a hideout run.</td></tr>';
+    var tot=worn+carry,gate=W.gate,room=gate-tot;
+    $("big").innerHTML='<div><b>'+Site.kg(worn)+'</b><span>Worn'+(am?" incl. "+(l.ammoN||0)+" rounds":"")+'</span></div><div><b>'+Site.kg(carry)+'</b><span>Carried out</span></div><div><b>'+Site.kg(tot)+'</b><span>Total</span></div><div><b>'+(room>0?Site.kg(room):"0 kg")+'</b><span>Room before '+gate+' kg</span></div>';
+    $("verdict").className="verdict "+(tot>=gate?"over":"ok");
+    $("verdict").textContent=tot>=gate?"Encumbered: drop "+Site.kg(tot-gate+0.01)+" to sprint again":"Under the "+gate+" kg limit";
+    var max=Math.max(70,Math.ceil(tot/10)*10),pc=function(x){return Math.min(100,x/max*100);};
+    $("bar").setAttribute("aria-label","Total "+Site.kg(tot)+" of the "+gate+" kg limit");
+    $("bar").innerHTML='<div class="fill carry" style="width:'+pc(tot)+'%"></div><div class="fill'+(tot>=gate?" over":"")+'" style="width:'+pc(worn)+'%"></div>'+
+      W.soft.filter(function(t){return t.b<gate;}).map(function(t){return '<div class="mk soft" style="left:'+pc(t.b)+'%"><span>'+t.b+'</span></div>';}).join("")+
+      '<div class="mk" style="left:'+pc(gate)+'%"><span>'+gate+' kg</span><em>encumbered</em></div>';
+    var notes=[];
+    if(slotsHave)notes.push("Bag uses "+slotsUsed+" of "+slotsHave+" slots in your rig, carrier and pack. That is a count of cells; whether the shapes fit is a different question.");
+    if(missing.length)notes.push("No published weight for "+missing.join(", ")+", so it is not counted.");
+    if(unk.length)notes.push("No published weight for "+unk.join(", ")+", so it is not counted.");
+    $("slotNote").textContent=notes.join(" ");
+  }
+  function drawPick(){
+    var t=norm($("q").value);
+    var list=L.items.filter(function(i){return (cat==="All"||i.category===cat||(i.alsoIn||[]).indexOf(cat)>=0)&&(!t||norm(i.name).indexOf(t)>=0);});
+    $("pickRows").innerHTML=list.map(function(i){return '<tr><td>'+Site.pic(i)+'</td><td>'+ext(i.page,i.name)+'</td><td>'+esc(i.category)+'</td><td class="mono">'+esc(i.size||"-")+'</td><td class="r mono">'+(i.weight!=null?i.weight:"-")+'</td><td><button type="button" data-add="'+esc(i.id)+'">Add</button></td></tr>';}).join("")||'<tr><td colspan="6" class="dim">No match.</td></tr>';
+  }
+  $("src").addEventListener("change",function(){chosen=this.value;draw();});
+  $("chips").addEventListener("click",function(e){var c=e.target.getAttribute("data-c");if(!c)return;cat=c;[].forEach.call($("chips").children,function(b){b.setAttribute("aria-pressed",b.getAttribute("data-c")===c);});drawPick();});
+  $("q").addEventListener("input",drawPick);
+  $("pickRows").addEventListener("click",function(e){var id=e.target.getAttribute("data-add");if(!id)return;GZK.change(function(s){var x=s.bag.filter(function(b){return b.id===id;})[0];if(x)x.n++;else s.bag.push({id:id,n:1});});});
+  $("bagRows").addEventListener("click",function(e){var i=e.target.getAttribute("data-rm");if(i==null)return;GZK.change(function(s){s.bag.splice(Number(i),1);});});
+  $("bagRows").addEventListener("change",function(e){var i=e.target.getAttribute("data-i");if(i==null)return;var n=Number(e.target.value);GZK.change(function(s){if(s.bag[i])s.bag[i].n=n;});});
+  $("clearBag").addEventListener("click",function(){GZK.change(function(s){s.bag=[];});});
+  drawSrc();draw();drawPick();GZK.on(function(){drawSrc();draw();});
+}).catch(function(e){Site.fail("sum",e);});
+})();
+</script>
+</main>
+</body>
+</html>

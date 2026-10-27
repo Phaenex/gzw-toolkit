@@ -1,0 +1,56 @@
+PASS home-desktop no console errors
+PASS home-desktop no sideways scroll - page is 0px wider than the viewport
+PASS home-desktop rendered content - 1624 characters in main
+PASS hideout-desktop no console errors
+PASS hideout-desktop no sideways scroll - page is 0px wider than the viewport
+PASS hideout-desktop rendered content - 31764 characters in main
+PASS loadout-desktop no console errors
+PASS loadout-desktop no sideways scroll - page is 0px wider than the viewport
+PASS loadout-desktop rendered content - 8398 characters in main
+PASS weight-desktop no console errors
+PASS weight-desktop no sideways scroll - page is 0px wider than the viewport
+PASS weight-desktop rendered content - 3019 characters in main
+PASS loot-desktop no console errors
+PASS loot-desktop no sideways scroll - page is 0px wider than the viewport
+PASS loot-desktop rendered content - 11106 characters in main
+PASS data-desktop no console errors
+PASS data-desktop no sideways scroll - page is 0px wider than the viewport
+PASS data-desktop rendered content - 1244 characters in main
+PASS home-phone no console errors
+PASS home-phone no sideways scroll - page is 0px wider than the viewport
+PASS home-phone rendered content - 1624 characters in main
+PASS hideout-phone no console errors
+PASS hideout-phone no sideways scroll - page is 0px wider than the viewport
+PASS hideout-phone rendered content - 31764 characters in main
+PASS loadout-phone no console errors
+PASS loadout-phone no sideways scroll - page is 0px wider than the viewport
+PASS loadout-phone rendered content - 8398 characters in main
+PASS weight-phone no console errors
+PASS weight-phone no sideways scroll - page is 0px wider than the viewport
+PASS weight-phone rendered content - 3019 characters in main
+PASS loot-phone no console errors
+PASS loot-phone no sideways scroll - page is 0px wider than the viewport
+PASS loot-phone rendered content - 11106 characters in main
+PASS data-phone no console errors
+PASS data-phone no sideways scroll - page is 0px wider than the viewport
+PASS data-phone rendered content - 1244 characters in main
+FAIL ranks survive reload - Turncoat select reads 
+FAIL hideout tick survives reload
+FAIL run tick survives reload
+FAIL built tick moves Next build on - Next build: GeneratorTiger Bay -> Next build: GeneratorTiger Bay industria
+FAIL named loadout survives reload - None saved yet.
+FAIL loadout draft survives reload
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.inputValue: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for locator('input[data-price="ak-12"]')[22m
+
+    at C:\Users\damat\Projects\gzw-toolkit\scripts\check-browser.mjs:83:47 {
+  log: [ `  - waiting for locator('input[data-price="ak-12"]')` ],
+  name: 'TimeoutError'
+}
+
+Node.js v24.18.1

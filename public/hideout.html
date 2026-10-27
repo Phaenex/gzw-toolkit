@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<meta name="description" content="Gray Zone Warfare 0.5 hideout planner: goals in build order, quick material runs with grid refs and extracts, kit by tier, door codes, safes and the tier 3 hacking-tool parts.">
+<title>Hideout runs</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/site.css">
+<style>
+ol.steps{margin:8px 0 14px;padding:0;list-style:none;counter-reset:s;max-width:90ch}
+ol.steps li{counter-increment:s;border:1px solid var(--line);background:var(--raised);padding:8px 12px 8px 40px;margin:0 0 6px;position:relative;font-size:.9rem}
+ol.steps li:before{content:counter(s);position:absolute;left:12px;top:8px;font-family:"JetBrains Mono",monospace;color:var(--amber);font-weight:600}
+ol.steps li small{display:block;color:var(--soft);font-size:.82rem;margin-top:2px}
+.run,.goal{border:1px solid var(--line);background:var(--raised);padding:10px 14px 6px;margin:0 0 12px;max-width:90ch;min-width:0}
+.run h4,.goal h4{margin:0 0 4px;font-family:Oswald,sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:.92rem;font-weight:500;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.run p,.goal p{margin:0 0 6px;font-size:.86rem;color:var(--soft);max-width:none}
+.run.done{opacity:.72}.goal.done{opacity:.7}
+.goal h4 .cnt{font-family:"JetBrains Mono",monospace;font-size:.74rem;color:var(--soft);text-transform:none;letter-spacing:0}
+.run .route{font-family:"JetBrains Mono",monospace;font-size:.78rem;color:var(--ink);overflow-wrap:anywhere}
+.run ol.steps li{background:var(--paper)}
+.run .facts{display:grid;grid-template-columns:max-content 1fr;gap:2px 10px;margin:0 0 8px;font-size:.82rem}
+.run .facts dt{font-family:Oswald,sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:.72rem;color:var(--ink);padding-top:2px}
+.run .facts dd{margin:0;color:var(--soft);min-width:0;overflow-wrap:anywhere}
+.stp a,.run .meta a{display:inline-block;min-height:24px;line-height:24px;margin-right:12px}
+.ticks{display:flex;flex-wrap:wrap;gap:2px 14px;margin:0 0 6px;font-size:.84rem}
+.ticks label,.donebox{display:inline-flex;align-items:center;gap:6px;min-height:24px;cursor:pointer}
+.donebox{font-size:.78rem;margin-left:auto;text-transform:none;letter-spacing:0;font-family:"Source Serif 4",serif}
+.guess{font-family:"JetBrains Mono",monospace;font-size:.66rem;color:var(--faint);border:1px solid var(--line-hard);padding:0 4px;margin-left:6px;text-transform:uppercase;white-space:nowrap}
+.code{font-family:"JetBrains Mono",monospace;font-weight:600;font-size:1rem;color:var(--go);border:1px solid var(--go);padding:0 6px;margin-right:6px}
+.kitlist{list-style:none;margin:0 0 8px;padding:0;font-size:.82rem}
+.kitlist li{display:flex;gap:8px;align-items:center;padding:3px 0;border-bottom:1px solid var(--line)}
+.kitlist .nm{flex:1;min-width:0}
+.rules{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;margin:0 0 12px;font-size:.88rem}
+.rules dt{font-family:Oswald,sans-serif;text-transform:uppercase;letter-spacing:.04em;font-size:.76rem}
+.rules dd{margin:0;color:var(--soft)}
+.unv{border-bottom:1px solid var(--line);padding:6px 0;font-size:.86rem;color:var(--soft);max-width:90ch}
+table.std.wide{min-width:640px}
+@media(max-width:700px){.rules,.run .facts{grid-template-columns:1fr}.run .facts dt{padding-top:6px}}
+</style>
+<script src="/store.js"></script>
+</head>
+<body>
+<main id="main">
+<h1>Hideout runs</h1>
+<p class="lede">What to build first in the 0.5 hideout, the runs that get each part, and the codes and safes on the way. Every stop is a place a guide or a player named, with their grid reference. Spawns are a chance, not a promise. Blue-painted Building Material Crates are worth opening on any run.</p>
+<nav class="subnav" aria-label="On this page"><a href="#next">Next build</a><a href="#goals">Goals</a><a href="#kits">Kit by tier</a><a href="#runs">Runs</a><a href="#codes">Codes and sites</a><a href="#hack">Hacking tool</a><a href="#safes">Safes</a><a href="#need">Materials</a><a href="#stations">Stations</a><a href="#unverified">Not verified</a></nav>
+
+<section id="next">
+<h2><span class="num">01</span> Next build</h2>
+<div class="note" id="unlock"></div>
+<ol class="steps" id="moves"></ol>
+<details><summary class="dim">Your vendor ranks</summary><div id="rankEd" style="margin-top:8px"></div></details>
+</section>
+
+<section id="goals">
+<h2><span class="num">02</span> Goals, in build order</h2>
+<p class="dim">Tick what you have built. Ticks are saved in this browser and decide the next build above.</p>
+<div id="goalList"></div>
+</section>
+
+<section id="kits">
+<h2><span class="num">03</span> Kit by tier</h2>
+<p class="lede">The armour floor this guide suggests for each tier of run, and the gear on the wiki that meets it, lowest vendor rank first. Set your ranks and each piece is marked as one you can buy or one that is still locked.</p>
+<div class="cards" id="kitCards"></div>
+<div class="note bad" id="kitsNote"></div>
+</section>
+
+<section id="runs">
+<h2><span class="num">04</span> Runs, grouped by goal</h2>
+<p class="dim">Grid refs are the in-game three-digit ones. The map links open the live GZW Tac Map; search the place name or pan to the grid ref there.</p>
+<div id="runList"></div>
+<h3>Named spots not on the tac map yet</h3>
+<div class="cards" id="unplotted"></div>
+</section>
+
+<section id="codes">
+<h2><span class="num">05</span> New 0.5 sites and door codes</h2>
+<p class="lede">Codes rotate. Each one says where its note is, so if a code fails, read the note. <span class="g">~</span> means the site is not pinned on any map yet and the ref is a guide's.</p>
+<div id="siteList"></div>
+</section>
+
+<section id="hack">
+<h2><span class="num">06</span> Tier 3 hacking tool</h2>
+<p id="hackNote"></p>
+<div class="tscroll"><table class="std wide">
+  <thead><tr><th>Part</th><th>Dismantle</th><th>Where</th><th>Grid</th></tr></thead>
+  <tbody id="hackRows"></tbody>
+</table></div>
+</section>
+
+<section id="safes">
+<h2><span class="num">07</span> Every safe on the tac map</h2>
+<p id="safeNote" class="dim"></p>
+<div class="tscroll"><table class="std">
+  <thead><tr><th>Region</th><th>Safe</th><th>Grid</th></tr></thead>
+  <tbody id="safeRows"></tbody>
+</table></div>
+</section>
+
+<section id="need">
+<h2><span class="num">08</span> What you need, and where</h2>
+<p class="lede">Every level 1 material, the stations that use it, and the run that gets it. <b>Named</b> means a guide pinned it to that place; <b>by type</b> means the wiki only gives the kind of building.</p>
+<div class="tscroll"><table class="std wide">
+  <thead><tr><th>Material</th><th>Used by</th><th>Run</th><th>Building type</th></tr></thead>
+  <tbody id="needRows"></tbody>
+</table></div>
+<div class="cards" id="farmCards"></div>
+</section>
+
+<section id="stations">
+<h2><span class="num">09</span> Build order and every level 1 station</h2>
+<ol class="steps" id="buildorder"></ol>
+<div class="cards" id="rooms"></div>
+<p class="lede"><span class="tier t1">seen</span> marks a cost also read off the in-game build screen on 23 Oct 2026. The rest come from the linked community guides.</p>
+<div class="tscroll"><table class="std wide">
+  <thead><tr><th>Room</th><th>Station</th><th>Build</th><th>Needs</th><th>Gives</th><th>Requires first</th><th>Power</th><th>Source</th></tr></thead>
+  <tbody id="stRows"></tbody>
+</table></div>
+<h3>Shopping list for all of level 1</h3>
+<p id="shop"></p>
+<h3>Progress faster</h3>
+<div class="cards" id="fastCards"></div>
+</section>
+
+<section id="unverified">
+<h2><span class="num">10</span> Not verified</h2>
+<p class="lede">Unpublished so far, so not used anywhere above.</p>
+<div id="unv"></div>
+</section>
+<script src="/site.js"></script>
+<script>
+(function(){
+"use strict";
+var $=Site.$,esc=Site.esc,ext=Site.ext;
+Site.ranks("rankEd");
+var src=function(o){return o.src?'<p class="dim">'+ext(o.src,o.k||"Source")+'</p>':"";};
+function card(t,d,o){return '<div class="cardx"><h4>'+esc(t)+'</h4><p>'+esc(d)+'</p>'+src(o||{})+'</div>';}
+Promise.all([Site.getJSON("/data/hideout.json"),Site.getJSON("/data/items.json")]).then(function(a){
+  var H=a[0],D=a[1],IT={};D.items.forEach(function(i){IT[i.id]=i;});
+  var g=function(p,approx){return p?'<span class="g">'+(approx?"~":"")+Math.round(p[0])+","+Math.round(p[1])+"</span>":'<span class="dim">not published</span>';};
+  var RUN={};H.runs.forEach(function(r){RUN[r.id]=r;});
+  var GOAL={};H.goals.forEach(function(x){GOAL[x.id]=x;});
+  var rl=function(ids){return ids.map(function(id){return '<a href="#run-'+esc(id)+'">'+esc(RUN[id].t.split(":")[0])+"</a>";}).join(", ");};
+  var parts=function(x){return x.st.length?x.st:(x.parts||[]);};
+  var doneN=function(x){var b=GZK.get().built;return parts(x).filter(function(i){return b[i];}).length;};
+  function nextGoal(){for(var i=0;i<H.goals.length;i++){if(doneN(H.goals[i])<parts(H.goals[i]).length)return H.goals[i];}return null;}
+
+  function drawNext(){
+    var r=GZK.get().ranks,known=r["Lab Rat"]&&r["Artisan"];
+    var open=known&&r["Lab Rat"]>=2&&r["Artisan"]>=2;
+    $("unlock").className="note "+(known?(open?"good":"bad"):"");
+    $("unlock").innerHTML='<b class="nt">'+(!known?"Is your hideout open?":open?"Your hideout is open":"Hideout still locked")+'</b>'+esc(H.unlock.text)+
+      (known?" You have Lab Rat R"+r["Lab Rat"]+" and Artisan R"+r["Artisan"]+(r["Banshee"]?", Banshee R"+r["Banshee"]+(r["Banshee"]>=3?", so smuggling is open too.":"."):"."):" Set your ranks below and this will tell you.")+" "+ext(H.unlock.src,H.unlock.k);
+    var x=nextGoal();
+    $("moves").innerHTML=(x?'<li>Next build: '+esc(x.t)+'<small>'+esc(x.d)+' Runs: '+rl(x.runs)+'</small></li>':'<li>Every goal on this page is ticked<small>Recipes and level 2 costs are not published yet.</small></li>')+
+      '<li>Keep every chemical and every stim<small>The Lab runs on them, and no vendor sells stims in 0.5.</small></li>';
+  }
+  function drawGoals(){
+    var b=GZK.get().built;
+    $("goalList").innerHTML=H.goals.map(function(x){
+      var its=parts(x),n=doneN(x),verb=x.st.length?"built":"in hand";
+      return '<div class="goal'+(n===its.length?" done":"")+'" id="goal-'+esc(x.id)+'"><h4>'+esc(x.t)+' <span class="cnt">'+n+" of "+its.length+" "+verb+'</span></h4>'+
+        '<p>'+esc(x.d)+'</p><div class="ticks">'+its.map(function(i){return '<label><input type="checkbox" data-k="'+esc(i)+'"'+(b[i]?" checked":"")+'>'+esc(i)+'</label>';}).join("")+'</div>'+
+        (x.need.length?'<p><b>Materials:</b> '+esc(x.need.join(", "))+'</p>':'')+
+        '<p><b>Runs:</b> '+rl(x.runs)+'</p>'+
+        (x.gaps.length?'<p><b>Not published anywhere:</b> '+esc(x.gaps.join(", "))+'. Open every Building Material Crate.</p>':'')+'</div>';}).join("");
+  }
+  $("goalList").addEventListener("change",function(e){var k=e.target.getAttribute("data-k");if(!k)return;var on=e.target.checked;GZK.change(function(s){if(on)s.built[k]=true;else delete s.built[k];});});
+
+  function kitLine(id){
+    var it=IT[id];if(!it)return "";
+    var can=GZK.canBuy(it),s=it.sold.filter(function(x){return x.rank!=null;}).sort(function(a,b){return a.rank-b.rank;});
+    return '<li>'+Site.pic(it)+'<span class="nm">'+ext(it.wiki,it.name)+' <span class="mono">'+esc(it.prot)+'</span><br><span class="dim">'+esc(s.map(function(x){return x.vendor+" R"+x.rank;}).join(", "))+", "+Site.kg(it.weight)+'</span></span>'+
+      (can==null?'':can?'<span class="tier ok" title="Your ranks can buy this">you can buy</span>':'<span class="tier no" title="Your ranks do not unlock this yet">locked</span>')+'</li>';
+  }
+  function drawKits(){
+    $("kitCards").innerHTML=["light","A","best"].map(function(k){var x=H.kits[k];
+      return '<div class="cardx" id="kit-'+k+'"><h4>'+esc(x.t)+'</h4><p>'+esc(x.d)+'</p>'+
+        '<p class="dim">Armour '+esc(x.vestFloor)+' or better</p><ul class="kitlist">'+x.vests.map(kitLine).join("")+'</ul>'+
+        '<p class="dim">Helmet '+esc(x.helmetFloor)+' or better</p><ul class="kitlist">'+x.helmets.map(kitLine).join("")+'</ul>'+
+        '<p class="dim">'+esc(x.src)+(GZK.canBuy({sold:[]})==null?' Set your ranks to see what you can buy.':'')+'</p></div>';}).join("");
+  }
+  $("kitsNote").innerHTML='<b class="nt">COPs are not safe</b>'+esc(H.kitsNote.replace(/^COPs are not safe\.\s*/,""))+" "+ext(H.kitsNoteSrc,"Devlog");
+
+  function drawRuns(){
+    var done=GZK.get().runsDone;
+    $("runList").innerHTML=H.runs.map(function(r){
+      return '<div class="run'+(done[r.id]?" done":"")+'" id="run-'+esc(r.id)+'"><h4><span class="tier t'+r.tier+'">T'+r.tier+'</span>'+esc(r.t)+
+        '<label class="donebox"><input type="checkbox" data-run="'+esc(r.id)+'"'+(done[r.id]?" checked":"")+'>done</label></h4>'+
+        '<p>'+esc(r.why)+'</p><dl class="facts">'+
+          (r.goals.length?'<dt>For</dt><dd>'+r.goals.map(function(id){return '<a href="#goal-'+esc(id)+'">'+esc(GOAL[id].t)+'</a>';}).join(", ")+'</dd>':'')+
+          '<dt>Kit</dt><dd><a href="#kit-'+esc(r.kit)+'">'+esc(H.kits[r.kit].t)+': armour '+esc(H.kits[r.kit].vestFloor)+'+, helmet '+esc(H.kits[r.kit].helmetFloor)+'+</a></dd>'+
+          (r.bag.length?'<dt>Bag</dt><dd>'+r.bag.map(function(b){return esc(b.m)+" "+esc(b.size)+", "+b.kg+" kg";}).join(" &middot; ")+' <a href="/weight?run='+esc(r.id)+'">weigh it</a></dd>':'')+
+          (r.safes.length?'<dt>Safes</dt><dd>'+r.safes.length+' within 3 squares: '+r.safes.map(function(x){return '<span class="g">'+x.g[0].toFixed(1)+","+x.g[1].toFixed(1)+"</span>";}).join(" ")+' <a href="#safes">all safes</a></dd>':'')+
+          (r.cop?'<dt>COP</dt><dd>Outpost '+esc(r.cop.n)+' '+g(r.cop.g)+', '+r.cop.d+' squares away. <a href="#kitsNote">Not safe</a></dd>':'')+
+        '</dl><p class="route">LZ '+esc(r.lz)+" "+g(r.lzg)+" &rarr; "+r.stops.map(function(s){return esc(s.n)+" "+g(s.g);}).join(" &rarr; ")+" &rarr; out at "+esc(r.out)+" "+g(r.outg)+'</p>'+
+        '<ol class="steps">'+r.stops.map(function(s){
+          return "<li>"+esc(s.n)+" "+g(s.g)+(s.guess?'<span class="guess">guess: building type</span>':'')+"<small>"+esc(s.what)+(s.sameAs?" Same guide ref as stop "+s.sameAs+".":"")+'</small><small class="stp">'+
+            s.mats.map(function(m){return '<span class="mat">'+esc(m)+"</span>";}).join(" ")+' '+ext(s.map,"Tac map")+ext(s.src,s.k)+"</small></li>";}).join("")+"</ol>"+
+        '<p>'+esc(r.risk)+"</p></div>";}).join("");
+  }
+  $("runList").addEventListener("change",function(e){var k=e.target.getAttribute("data-run");if(!k)return;var on=e.target.checked;GZK.change(function(s){if(on)s.runsDone[k]=true;else delete s.runsDone[k];});});
+
+  $("unplotted").innerHTML=H.unplotted.map(function(u){return card(u.n,u.d,{src:u.src,k:"Guide"});}).join("");
+  $("siteList").innerHTML=H.sites.map(function(s){
+    var approx=s.howSrc!==s.map;
+    return '<div class="run"><h4>'+esc(s.n)+' <span class="dim">'+esc(s.aka)+"</span> "+g(s.g,approx)+"</h4>"+
+      "<p>"+esc(s.how)+" "+ext(s.howSrc,"source")+"</p>"+
+      (s.lz?'<p class="route">LZ '+esc(s.lz)+" "+g(s.lzg)+'</p><p>'+esc(s.lz)+" is "+esc(s.lzNote)+"</p>":"")+
+      (s.codes.length?'<ol class="steps">'+s.codes.map(function(c){return '<li><span class="code">'+esc(c.c)+"</span> "+esc(c.door)+"<small>Note: "+esc(c.note)+" "+ext(c.src,"source")+"</small></li>";}).join("")+"</ol>":'<p class="dim">No door codes published yet.</p>')+
+      (s.layout?'<h3>Layout, from the gate <span class="dim">('+esc(s.layoutSrc)+')</span></h3><dl class="rules">'+s.layout.map(function(l){return "<dt>"+esc(l[0])+"</dt><dd>"+esc(l[1])+"</dd>";}).join("")+"</dl>":"")+
+      "<p>"+esc(s.also)+"</p>"+(s.map?'<p class="meta">'+ext(s.map,"Tac map")+'</p>':"")+"</div>";}).join("");
+  $("hackNote").innerHTML=esc(H.hack.note)+" "+ext(H.hack.src,"TPose Gaming");
+  $("hackRows").innerHTML=H.hack.parts.map(function(p){return '<tr><td class="nm">'+esc(p.part)+'</td><td>'+ext(p.wiki,p.from)+"</td><td>"+esc(p.where)+'</td><td>'+g(p.g)+"</td></tr>";}).join("");
+  $("safeNote").innerHTML=esc(H.safesNote)+" "+ext("https://gzwtacmap.com/maps/lamang","GZW Tac Map");
+  $("safeRows").innerHTML=H.safes.map(function(s){return '<tr><td class="nm">'+esc(s.r)+"</td><td>"+esc(s.n)+'</td><td><span class="g">'+s.g[0].toFixed(1)+","+s.g[1].toFixed(1)+'</span></td></tr>';}).join("");
+  $("needRows").innerHTML=H.mats.map(function(m){
+    var run=m.named.length?"<b>Named:</b> "+rl(m.named):"";
+    if(m.typeRuns.length)run+=(run?"<br>":"")+"<b>By type:</b> "+rl(m.typeRuns);
+    if(!run)run=m.type?"Any "+esc(m.type.split(",")[0].toLowerCase())+"; no run yet":"Not published. Open every Building Material Crate.";
+    return '<tr><td class="nm">'+esc(m.m)+"</td><td>"+esc(m["for"].join(", "))+"</td><td>"+run+"</td><td>"+esc(m.type||"")+"</td></tr>";}).join("");
+  $("farmCards").innerHTML=H.farm.map(function(f){return card(f.t,f.d,{src:f.src,k:"Guide"});}).join("");
+  $("buildorder").innerHTML=H.order.map(function(s){return "<li>"+esc(s.a)+"<small>"+esc(s.w)+"</small></li>";}).join("");
+  $("rooms").innerHTML=H.rooms.map(function(r){return card(r.n,r.d,r);}).join("");
+  $("stRows").innerHTML=H.stations.map(function(s){
+    return '<tr><td class="nm">'+esc(s.room)+'</td><td>'+esc(s.station)+'</td><td>'+esc(s.device)+(s.seen?' <span class="tier t1">seen</span>':'')+'</td><td>'+esc(s.res.join(", "))+'</td><td>'+esc(s.grants)+'</td><td>'+esc(s.needs||"")+'</td><td>'+esc(s.power||"")+'</td><td>'+ext(s.src,"guide")+'</td></tr>';}).join("");
+  var tot={};H.stations.forEach(function(s){s.res.forEach(function(r){var m=r.match(/^(.*?)(?: x(\d+))?$/);tot[m[1]]=(tot[m[1]]||0)+(+m[2]||1);});});
+  $("shop").textContent=Object.keys(tot).sort(function(a,b){return tot[b]-tot[a]||a.localeCompare(b);}).map(function(k){return k+(tot[k]>1?" x"+tot[k]:"");}).join(", ")+".";
+  $("fastCards").innerHTML=H.fast.map(function(f){return card(f.t,f.d,f);}).join("");
+  $("unv").innerHTML=H.unv.map(function(u){return '<div class="unv">'+esc(u.c)+": "+esc(u.r)+"</div>";}).join("");
+  function all(){drawNext();drawGoals();drawKits();drawRuns();}
+  all();GZK.on(all);
+  if(location.hash){var tg=document.getElementById(location.hash.slice(1));if(tg)setTimeout(function(){tg.scrollIntoView();},0);}
+}).catch(function(e){Site.fail("next",e);});
+})();
+</script>
+</main>
+</body>
+</html>

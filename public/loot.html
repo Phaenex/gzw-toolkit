@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<meta name="description" content="Gray Zone Warfare 0.5 loot sell values: price, the vendor who pays best for each kind, and value per inventory slot and per kg.">
+<title>Loot values</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/site.css">
+<style>
+td .pic{width:40px;height:30px}
+table.std th button[aria-sort]{color:var(--amber)}
+#lootTable{min-width:620px}
+</style>
+<script src="/store.js"></script>
+</head>
+<body>
+<main id="main">
+<h1>Loot values</h1>
+<p class="lede">What each piece of loot sells for, who pays the most for its kind, and what it is worth per inventory slot and per kilogram. When the bag is full, drop the lowest per-slot item first; when you are near the weight limit, the lowest per-kg one.</p>
+
+<section id="best">
+<h2><span class="num">01</span> Best vendor by kind</h2>
+<p class="dim" id="bestSrc"></p>
+<div class="tscroll"><table class="std">
+  <thead><tr><th>Kind</th><th>Sell to</th><th class="r">Items</th></tr></thead>
+  <tbody id="bestRows"></tbody>
+</table></div>
+</section>
+
+<section id="all">
+<h2><span class="num">02</span> Every item</h2>
+<div class="row">
+  <label for="q">Search</label><input id="q" type="search" placeholder="item name">
+  <label for="cat">Kind</label><select id="cat"><option value="">All</option></select>
+  <label><input type="checkbox" id="hideTask"> Hide task-only items</label>
+  <span class="dim" id="count" role="status"></span>
+</div>
+<div class="tscroll"><table class="std" id="lootTable">
+  <thead><tr><th></th><th><button data-s="name">Item</button></th><th><button data-s="category">Kind</button></th><th>Sell to</th><th class="r"><button data-s="price">Price</button></th><th>Size</th><th class="r"><button data-s="perSlot">Per slot</button></th><th class="r"><button data-s="weight">kg</button></th><th class="r"><button data-s="perKg">Per kg</button></th></tr></thead>
+  <tbody id="rows"></tbody>
+</table></div>
+<p class="dim">Prices are the wiki infobox sell price. Vendors can pay less than the best price; the wiki gives one number. An item with no price shows a dash, not a guess.</p>
+</section>
+<script src="/site.js"></script>
+<script>
+(function(){
+"use strict";
+var $=Site.$,esc=Site.esc,ext=Site.ext,sortK="perSlot",dir=-1;
+Site.getJSON("/data/loot.json").then(function(L){
+  var SEC={};L.sections.forEach(function(s){SEC[s.section]=s;});
+  var count={};L.items.forEach(function(i){count[i.category]=(count[i.category]||0)+1;});
+  $("bestSrc").innerHTML="From the wiki's "+ext("https://gray-zone-warfare.fandom.com/wiki/Loot","Loot page")+", read "+esc(L.fetchedAt.slice(0,10))+". \"Not stated\" means the wiki names no one vendor who pays best for that kind.";
+  $("bestRows").innerHTML=L.sections.map(function(s){return '<tr><td class="nm">'+esc(s.section)+'</td><td>'+(s.buyer?esc(s.buyer):'<span class="dim">not stated</span>')+(s.taskOnly?' <span class="dim">(task items)</span>':'')+'</td><td class="r mono">'+(count[s.section]||0)+'</td></tr>';}).join("");
+  $("cat").insertAdjacentHTML("beforeend",L.sections.map(function(s){return '<option>'+esc(s.section)+'</option>';}).join(""));
+  function draw(){
+    var t=$("q").value.toLowerCase(),c=$("cat").value,ht=$("hideTask").checked;
+    var list=L.items.filter(function(i){return (!c||i.category===c||(i.alsoIn||[]).indexOf(c)>=0)&&(!t||i.name.toLowerCase().indexOf(t)>=0)&&!(ht&&i.taskOnly);});
+    list.sort(function(a,b){var x=a[sortK],y=b[sortK];if(x==null&&y==null)return 0;if(x==null)return 1;if(y==null)return -1;return (typeof x==="string"?x.localeCompare(y):x-y)*dir;});
+    $("count").textContent=list.length+" of "+L.items.length+" items";
+    $("rows").innerHTML=list.map(function(i){return '<tr><td>'+Site.pic(i)+'</td><td>'+ext(i.page,i.name)+(i.taskOnly?' <span class="dim">task</span>':'')+'</td><td>'+esc(i.category)+'</td><td>'+esc(i.buyer||"")+'</td><td class="r mono">'+Site.money(i.price)+'</td><td class="mono">'+esc(i.size||"-")+'</td><td class="r mono">'+Site.money(i.perSlot)+'</td><td class="r mono">'+(i.weight!=null?i.weight:"-")+'</td><td class="r mono">'+Site.money(i.perKg)+'</td></tr>';}).join("");
+    [].forEach.call(document.querySelectorAll("#lootTable th button"),function(b){if(b.getAttribute("data-s")===sortK)b.setAttribute("aria-sort",dir<0?"descending":"ascending");else b.removeAttribute("aria-sort");});
+  }
+  $("lootTable").querySelector("thead").addEventListener("click",function(e){var k=e.target.getAttribute("data-s");if(!k)return;if(k===sortK)dir=-dir;else{sortK=k;dir=k==="name"||k==="category"?1:-1;}draw();});
+  ["q","cat","hideTask"].forEach(function(id){$(id).addEventListener(id==="q"?"input":"change",draw);});
+  draw();
+}).catch(function(e){Site.fail("best",e);});
+})();
+</script>
+</main>
+</body>
+</html>

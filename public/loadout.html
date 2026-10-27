@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<meta name="description" content="Gray Zone Warfare 0.5 loadout builder: pick a weapon, armour, helmet, rig, backpack and ammo from the wiki's item data, see which vendor rank each needs, and save named loadouts in your browser.">
+<title>Loadout builder</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/site.css">
+<style>
+.slots{display:grid;gap:10px;margin:0 0 16px}
+.slot{border:1px solid var(--line);background:var(--raised);padding:10px 12px;display:grid;grid-template-columns:110px 1fr;gap:6px 12px;align-items:start;min-width:0}
+.slot>.lab{font-family:Oswald,sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:.78rem;padding-top:6px}
+.slot select{width:100%}
+.slot .info{display:flex;gap:10px;align-items:flex-start;margin-top:6px;min-width:0}
+.slot .info .txt{flex:1;min-width:0;font-size:.84rem;color:var(--soft)}
+.slot .info .txt b{color:var(--ink)}
+.slot .opts{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin-top:6px;font-size:.82rem}
+.slot .opts input[type=number]{width:96px}
+.flag{font-size:.8rem;color:var(--soft);margin-top:4px}
+.flag li{margin:2px 0}
+.tot{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:10px;margin:0 0 12px}
+.tot div{border:1px solid var(--line);background:var(--raised);padding:8px 12px}
+.tot b{display:block;font-family:"JetBrains Mono",monospace;font-size:1.1rem}
+.tot span{font-size:.74rem;color:var(--soft);text-transform:uppercase;letter-spacing:.06em;font-family:Oswald,sans-serif}
+.saved li{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;border-bottom:1px solid var(--line);padding:6px 0}
+.saved li .nm{flex:1;min-width:140px}
+.saved ul{list-style:none;margin:0;padding:0}
+@media(max-width:600px){.slot{grid-template-columns:1fr}.slot>.lab{padding-top:0}}
+</style>
+<script src="/store.js"></script>
+</head>
+<body>
+<main id="main">
+<h1>Loadout builder</h1>
+<p class="lede">Pick each piece from the wiki's item data. Every piece shows the vendor and rank that sells it, and anything your ranks do not unlock yet is flagged. The wiki does not publish buy prices, so type the price off your vendor screen once and it is remembered for every loadout.</p>
+
+<section id="build">
+<details id="rk"><summary class="dim">Your vendor ranks</summary><div id="rankEd" style="margin-top:8px"></div></details>
+<p class="row"><label><input type="checkbox" id="onlyBuy"> Only list what my ranks can buy</label> <span class="dim" id="rankState"></span></p>
+<div class="slots" id="slots"></div>
+<h3>Totals</h3>
+<div class="tot" id="tot"></div>
+<div class="tscroll"><table class="std">
+  <thead><tr><th>Vendor</th><th>Items</th><th class="r">Cost</th><th>Unpriced</th></tr></thead>
+  <tbody id="byVendor"></tbody>
+</table></div>
+<p class="dim" id="lockNote"></p>
+<div class="row">
+  <label for="lname">Name</label><input id="lname" maxlength="60" placeholder="Tiger Bay run">
+  <button class="go" id="saveBtn" type="button">Save loadout</button>
+  <button id="newBtn" type="button">Start a new one</button>
+  <a class="btn" href="/weight">Weigh it</a>
+  <span class="dim" id="saveMsg" role="status"></span>
+</div>
+</section>
+
+<section id="saved" class="saved">
+<h2><span class="num">02</span> Saved loadouts</h2>
+<p class="dim">Saved in this browser only. Move them to another browser from <a href="/data">Your data</a>.</p>
+<ul id="savedList"></ul>
+</section>
+
+<section id="rules">
+<h2><span class="num">03</span> How to read it</h2>
+<p><b>Rank:</b> the wiki's vendor and rank for each item. An item with no stated rank cannot be checked and is labelled so. <b>Loot only</b> means no vendor sells it; you find it. <b>Owned</b> takes an item out of the cost, for gear already in your stash.</p>
+<p><b>Ammo:</b> the list follows the weapon's own wiki ammo list. The tier letter is the wiki Ballistics chart rule: <span id="ammoRule"></span></p>
+</section>
+<script src="/site.js"></script>
+<script>
+(function(){
+"use strict";
+var $=Site.$,esc=Site.esc,ext=Site.ext;
+Site.ranks("rankEd");
+var SLOTS=[["weapon","Weapon","weapon"],["vest","Armour","vest"],["helmet","Helmet","helmet"],["rig","Rig","rig"],["backpack","Backpack","backpack"],["ammo","Ammo","ammo"]];
+var current=null; /* id of the saved loadout being edited, or null */
+try{if(!GZK.get().ranks||!Object.keys(GZK.get().ranks).length)$("rk").open=true;}catch(e){}
+Site.getJSON("/data/items.json").then(function(D){
+  var IT={},BY={};D.items.forEach(function(i){IT[i.id]=i;(BY[i.group]=BY[i.group]||[]).push(i);});
+  $("ammoRule").textContent=D.rules.ammo;
+  Object.keys(BY).forEach(function(g){BY[g].sort(function(a,b){return a.name.localeCompare(b.name);});});
+  var ranked=function(it){return it.sold.filter(function(s){return s.rank!=null;}).sort(function(a,b){return a.rank-b.rank;});};
+  function srcOf(it){
+    var s=ranked(it),r=GZK.get().ranks;
+    var ok=s.filter(function(x){return r[x.vendor]>=x.rank;});
+    if(ok.length)return {v:ok[0].vendor,rank:ok[0].rank,can:true};
+    if(s.length)return {v:s[0].vendor,rank:s[0].rank,can:Object.keys(r).length?false:null};
+    if(it.sold.length)return {v:it.sold[0].vendor,rank:null,can:null};
+    return {v:null,rank:null,can:null,loot:it.loot};
+  }
+  function stat(it){
+    var g=it.group;
+    if(g==="weapon")return [it.cls,it.calName||it.caliber,it.moa!=null?it.moa.toFixed(2)+" MOA":"",it.rpm?it.rpm+" rpm":"",it.punch?"punch "+it.punch:""].filter(Boolean).join(" · ");
+    if(g==="ammo")return [it.calName,it.tier?"tier "+it.tier:"",it.reach!=null&&it.reach>=0?"through "+D.classes[it.reach]:"rated 0 against armour",it.velocity?it.velocity+" m/s":""].filter(Boolean).join(" · ");
+    if(g==="vest"||g==="helmet")return [it.prot?"class "+it.prot:"class not published",it.material,it.kind||it.type,it.slots?it.slots+" slots":""].filter(Boolean).join(" · ");
+    return [it.slots!=null?it.slots+" slots":"slots not published",it.size].filter(Boolean).join(" · ");
+  }
+  function options(slot){
+    var d=GZK.get().draft,list=BY[slot]||[];
+    if(slot==="ammo"&&d.weapon&&IT[d.weapon]&&IT[d.weapon].rounds){var rs=IT[d.weapon].rounds;list=list.filter(function(a){return rs.indexOf(a.id)>=0;});}
+    var only=$("onlyBuy").checked;
+    if(only)list=list.filter(function(i){return srcOf(i).can!==false||i.id===d[slot];});
+    if(slot==="vest"||slot==="helmet")list=list.slice().sort(function(a,b){return D.classes.indexOf(b.prot)-D.classes.indexOf(a.prot)||a.name.localeCompare(b.name);});
+    if(slot==="ammo")list=list.slice().sort(function(a,b){return (a.tier||"Z").localeCompare(b.tier||"Z")||a.name.localeCompare(b.name);});
+    return '<option value="">None</option>'+list.map(function(i){
+      var s=srcOf(i),tag=s.rank!=null?s.v+" R"+s.rank:s.v?s.v+" R?":"loot only";
+      var lead=slot==="vest"||slot==="helmet"?(i.prot||"?")+" · ":slot==="ammo"&&i.tier?i.tier+" · ":"";
+      return '<option value="'+esc(i.id)+'"'+(d[slot]===i.id?" selected":"")+'>'+esc(lead+i.name+" ("+tag+")"+(s.can===false?" locked":""))+'</option>';}).join("");
+  }
+  function drawSlots(){
+    var st=GZK.get(),d=st.draft;
+    $("slots").innerHTML=SLOTS.map(function(sl){
+      var k=sl[0],it=d[k]&&IT[d[k]],s=it&&srcOf(it);
+      var info="";
+      if(it){
+        var tag=s.can===true?'<span class="tier ok">you can buy</span>':s.can===false?'<span class="tier no">locked: needs '+esc(s.v)+' R'+s.rank+'</span>':"";
+        info='<div class="info">'+Site.pic(it)+'<div class="txt"><b>'+ext(it.wiki,it.name)+'</b> '+tag+'<br>'+esc(stat(it))+'<br>'+
+          (s.v?esc(it.sold.map(function(x){return x.vendor+(x.rank!=null?" R"+x.rank:" rank not stated");}).join(", ")):it.loot?"Loot only. No vendor sells it.":"No source listed on the wiki.")+
+          ' · '+Site.kg(it.weight)+(k==="ammo"?" per round":"")+(it.size?" · "+esc(it.size):"")+'</div></div>'+
+          (it.flags&&it.flags.length?'<ul class="flag">'+it.flags.map(function(f){return "<li>"+esc(f)+"</li>";}).join("")+'</ul>':'')+
+          '<div class="opts">'+
+            (k==="ammo"?'<label>Rounds <input type="number" min="0" max="2000" step="10" data-n="1" value="'+(d.ammoN||0)+'"></label>':'')+
+            (s.v?'<label>Price '+(k==="ammo"?"per round ":"")+'$ <input type="number" min="0" step="1" data-price="'+esc(it.id)+'" value="'+(st.prices[it.id]!=null?st.prices[it.id]:"")+'" placeholder="from vendor"></label>':'')+
+            (k!=="ammo"?'<label><input type="checkbox" data-own="'+esc(it.id)+'"'+(st.owned[it.id]?" checked":"")+'> Owned</label>':'')+
+          '</div>';
+      }
+      return '<div class="slot"><label class="lab" for="sel-'+k+'">'+sl[1]+'</label><div><select id="sel-'+k+'" data-slot="'+k+'">'+options(sl[2])+'</select>'+info+'</div></div>';}).join("");
+  }
+  function totals(){
+    var st=GZK.get(),d=st.draft,w=0,by={},locked=[],unpriced=0,cost=0;
+    SLOTS.forEach(function(sl){
+      var k=sl[0],it=d[k]&&IT[d[k]];if(!it)return;
+      var qty=k==="ammo"?(d.ammoN||0):1;
+      w+=(it.weight||0)*qty;
+      var s=srcOf(it);if(s.can===false)locked.push(it.name+" ("+s.v+" R"+s.rank+")");
+      var v=st.owned[it.id]&&k!=="ammo"?"Owned":s.v||"Loot only";
+      var row=by[v]=by[v]||{n:[],cost:0,miss:[]};
+      row.n.push(it.name+(k==="ammo"?" x"+qty:""));
+      if(v==="Owned"||v==="Loot only")return;
+      if(st.prices[it.id]==null){row.miss.push(it.name);unpriced++;}else{row.cost+=st.prices[it.id]*qty;cost+=st.prices[it.id]*qty;}
+    });
+    var slots=0;["rig","backpack","vest"].forEach(function(k){var it=d[k]&&IT[d[k]];if(it&&it.slots)slots+=it.slots;});
+    $("tot").innerHTML='<div><b>'+Site.kg(w)+'</b><span>Weight worn</span></div><div><b>'+Site.money(cost)+'</b><span>Cost'+(unpriced?", "+unpriced+" unpriced":"")+'</span></div>'+
+      '<div><b>'+slots+'</b><span>Carry slots (rig, carrier, pack)</span></div><div><b>'+locked.length+'</b><span>Locked at your ranks</span></div>';
+    var keys=Object.keys(by);
+    $("byVendor").innerHTML=keys.length?keys.map(function(v){var r=by[v];
+      return '<tr><td class="nm">'+esc(v)+'</td><td>'+esc(r.n.join(", "))+'</td><td class="r mono">'+(v==="Owned"||v==="Loot only"||r.miss.length===r.n.length?"-":Site.money(r.cost))+'</td><td>'+(r.miss.length?esc(r.miss.join(", ")):"")+'</td></tr>';}).join(""):'<tr><td colspan="4" class="dim">Pick something above.</td></tr>';
+    var known=Object.keys(st.ranks).length;
+    $("rankState").textContent=known?"Checking against "+known+" vendor rank"+(known>1?"s":"")+" you set.":"No ranks set, so nothing is flagged as locked.";
+    $("lockNote").textContent=locked.length?"Locked at your ranks: "+locked.join(", ")+".":"";
+  }
+  function drawSaved(){
+    var L=GZK.get().loadouts;
+    $("savedList").innerHTML=L.length?L.map(function(l){
+      var names=SLOTS.map(function(s){return l[s[0]]&&IT[l[s[0]]]?IT[l[s[0]]].name:null;}).filter(Boolean);
+      return '<li><span class="nm"><b>'+esc(l.name)+'</b>'+(l.id===current?' <span class="tier t2">editing</span>':'')+'<br><span class="dim">'+esc(names.join(", ")||"empty")+(l.saved?" · saved "+esc(l.saved.slice(0,10)):"")+'</span></span>'+
+        '<button type="button" data-load="'+esc(l.id)+'">Load</button><a class="btn" href="/weight?l='+encodeURIComponent(l.id)+'">Weigh</a><button type="button" data-del="'+esc(l.id)+'">Delete</button></li>';}).join(""):'<li class="dim">None saved yet.</li>';
+  }
+  function all(){drawSlots();totals();drawSaved();}
+  $("slots").addEventListener("change",function(e){
+    var t=e.target,k=t.getAttribute("data-slot"),p=t.getAttribute("data-price"),o=t.getAttribute("data-own");
+    if(k)GZK.change(function(s){if(t.value)s.draft[k]=t.value;else delete s.draft[k];
+      if(k==="weapon"&&s.draft.ammo&&IT[t.value]&&(IT[t.value].rounds||[]).indexOf(s.draft.ammo)<0)delete s.draft.ammo;});
+    else if(p)GZK.change(function(s){if(t.value==="")delete s.prices[p];else s.prices[p]=Number(t.value);});
+    else if(o)GZK.change(function(s){if(t.checked)s.owned[o]=true;else delete s.owned[o];});
+    else if(t.getAttribute("data-n"))GZK.change(function(s){s.draft.ammoN=Number(t.value)||0;});
+  });
+  $("onlyBuy").addEventListener("change",drawSlots);
+  $("saveBtn").addEventListener("click",function(){
+    var name=$("lname").value.trim()||"Loadout "+(GZK.get().loadouts.length+1);
+    var ok=GZK.change(function(s){
+      var l=Object.assign({},s.draft,{name:name,saved:new Date().toISOString()});
+      var ex=current&&s.loadouts.filter(function(x){return x.id===current;})[0];
+      if(ex&&ex.name===name){Object.assign(ex,{weapon:"",vest:"",helmet:"",rig:"",backpack:"",ammo:"",ammoN:0},l);}
+      else{current="l"+Date.now().toString(36);l.id=current;s.loadouts.push(l);}
+    });
+    $("saveMsg").textContent=ok?"Saved \""+name+"\" in this browser.":"Could not save: this browser is blocking storage.";
+  });
+  $("newBtn").addEventListener("click",function(){current=null;$("lname").value="";GZK.change(function(s){s.draft={};});$("saveMsg").textContent="";});
+  $("savedList").addEventListener("click",function(e){
+    var id=e.target.getAttribute("data-load"),del=e.target.getAttribute("data-del");
+    if(id){var l=GZK.get().loadouts.filter(function(x){return x.id===id;})[0];if(!l)return;current=id;$("lname").value=l.name;
+      GZK.change(function(s){s.draft={};SLOTS.forEach(function(sl){if(l[sl[0]])s.draft[sl[0]]=l[sl[0]];});s.draft.ammoN=l.ammoN;});$("saveMsg").textContent="Loaded \""+l.name+"\".";window.scrollTo(0,0);}
+    if(del){var n=GZK.get().loadouts.filter(function(x){return x.id===del;})[0];if(n&&confirm("Delete \""+n.name+"\"?")){if(current===del)current=null;GZK.change(function(s){s.loadouts=s.loadouts.filter(function(x){return x.id!==del;});});}}
+  });
+  all();GZK.on(function(){var a=document.activeElement,id=a&&a.id,pk=a&&a.getAttribute&&a.getAttribute("data-price");all();
+    if(id&&$(id))$(id).focus();else if(pk){var el=document.querySelector('[data-price="'+pk+'"]');if(el)el.focus();}});
+}).catch(function(e){Site.fail("build",e);});
+})();
+</script>
+</main>
+</body>
+</html>

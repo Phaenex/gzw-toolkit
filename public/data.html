@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<meta name="description" content="Export, import or clear what GZW Toolkit has saved in your browser. No accounts, nothing stored on a server.">
+<title>Your data</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/site.css">
+<script src="/store.js"></script>
+</head>
+<body>
+<main id="main">
+<h1>Your data</h1>
+<p class="lede">Everything you set on this site is kept in this browser's local storage, under the key <span class="mono" id="key"></span>. There are no accounts, no cookies, and nothing you enter is sent to a server. Clearing your browser's site data deletes it, so export a copy if it matters.</p>
+
+<section id="now">
+<h2><span class="num">01</span> What is saved</h2>
+<p id="summary"></p>
+</section>
+
+<section id="io">
+<h2><span class="num">02</span> Export and import</h2>
+<p>Export downloads one JSON file. Import replaces what this browser has with the file's contents.</p>
+<div class="row">
+  <button class="go" type="button" id="exp">Download export</button>
+  <label class="btn" for="file">Import a file</label><input class="sr" type="file" id="file" accept="application/json,.json">
+  <span class="dim" id="msg" role="status"></span>
+</div>
+</section>
+
+<section id="wipe">
+<h2><span class="num">03</span> Clear</h2>
+<p>Deletes everything this site saved in this browser.</p>
+<button type="button" id="clr">Clear my data</button>
+</section>
+
+<section id="sources">
+<h2><span class="num">04</span> Where the numbers come from</h2>
+<ul>
+<li>Gear stats, vendor ranks, sizes, weights and pictures: each item's own page on the <a href="https://gray-zone-warfare.fandom.com/" rel="noopener" target="_blank">Gray Zone Warfare Fandom wiki</a>. Every item links to its page.</li>
+<li>Sell prices and the best vendor for each kind: the wiki's <a href="https://gray-zone-warfare.fandom.com/wiki/Loot" rel="noopener" target="_blank">Loot page</a> and item infoboxes, plus the Building Material and Disassembly Material categories.</li>
+<li>The 54 kg limit: the wiki's <a href="https://gray-zone-warfare.fandom.com/wiki/Health_system" rel="noopener" target="_blank">Health system</a> page.</li>
+<li>Safes, landing zones, outposts and 0.5 site pins: the <a href="https://gzwtacmap.com/maps/lamang" rel="noopener" target="_blank">GZW Tac Map</a>.</li>
+<li>Hideout costs, runs and codes: the community guides credited on each line of the <a href="/hideout">hideout page</a>.</li>
+<li>Buy prices are not published anywhere we could read, so the loadout builder asks you for them.</li>
+</ul>
+</section>
+<script src="/site.js"></script>
+<script>
+(function(){
+"use strict";
+var $=Site.$;
+$("key").textContent=GZK.KEY;
+function sum(){$("summary").textContent=GZK.summary()+".";}
+sum();GZK.on(sum);
+$("exp").addEventListener("click",function(){
+  var blob=new Blob([GZK.exportJSON()],{type:"application/json"}),a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);a.download="gzw-toolkit-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
+  $("msg").textContent="Exported: "+GZK.summary()+".";
+});
+$("file").addEventListener("change",function(){
+  var f=this.files[0];if(!f)return;var input=this;
+  f.text().then(function(t){$("msg").textContent="Imported: "+GZK.importJSON(t)+".";})
+   .catch(function(e){$("msg").textContent="Not imported: "+(e instanceof SyntaxError?"that file is not valid JSON.":e.message);})
+   .then(function(){input.value="";});
+});
+$("clr").addEventListener("click",function(){if(confirm("Delete everything this site saved in this browser?")){GZK.clear();$("msg").textContent="Cleared.";}});
+})();
+</script>
+</main>
+</body>
+</html>

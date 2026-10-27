@@ -1,0 +1,60 @@
+{
+ "app": "gzw-toolkit",
+ "version": 1,
+ "exportedAt": "2026-10-27T02:00:43.559Z",
+ "data": {
+  "v": 1,
+  "ranks": {
+   "Turncoat": 2,
+   "Handshake": 1
+  },
+  "built": {
+   "Two-Stroke Engine": true
+  },
+  "runsDone": {
+   "tigerbay": true
+  },
+  "owned": {},
+  "prices": {
+   "ak-12": 12345
+  },
+  "loadouts": [
+   {
+    "id": "lmvq1gop7",
+    "name": "Check loadout",
+    "weapon": "ak-12",
+    "vest": "lvs-tactical-multicam",
+    "helmet": "",
+    "rig": "",
+    "backpack": "",
+    "ammo": "5-45x39mm-bp-7n22",
+    "ammoN": 120,
+    "saved": "2026-10-27T02:00:41.226Z"
+   }
+  ],
+  "draft": {
+   "weapon": "ak-12",
+   "vest": "lvs-tactical-multicam",
+   "ammo": "5-45x39mm-bp-7n22",
+   "ammoN": 120
+  },
+  "bag": [
+   {
+    "id": "steel",
+    "n": 1
+   },
+   {
+    "id": "motor-oil",
+    "n": 1
+   },
+   {
+    "id": "mechanical-parts",
+    "n": 1
+   },
+   {
+    "id": "plumbing-parts",
+    "n": 1
+   }
+  ]
+ }
+}
