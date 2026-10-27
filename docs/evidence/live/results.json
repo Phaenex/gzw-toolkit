@@ -1,0 +1,254 @@
+{
+ "base": "https://gzw-toolkit.vercel.app",
+ "at": "2026-10-27T04:39:41.467Z",
+ "checks": 50,
+ "failed": 0,
+ "results": [
+  {
+   "name": "home-desktop no console errors",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "home-desktop no sideways scroll",
+   "pass": true,
+   "detail": "page is 0px wider than the viewport"
+  },
+  {
+   "name": "home-desktop rendered content",
+   "pass": true,
+   "detail": "1624 characters in main"
+  },
+  {
+   "name": "hideout-desktop no console errors",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "hideout-desktop no sideways scroll",
+   "pass": true,
+   "detail": "page is 0px wider than the viewport"
+  },
+  {
+   "name": "hideout-desktop rendered content",
+   "pass": true,
+   "detail": "31796 characters in main"
+  },
+  {
+   "name": "loadout-desktop no console errors",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "loadout-desktop no sideways scroll",
+   "pass": true,
+   "detail": "page is 0px wider than the viewport"
+  },
+  {
+   "name": "loadout-desktop rendered content",
+   "pass": true,
+   "detail": "8398 characters in main"
+  },
+  {
+   "name": "weight-desktop no console errors",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "weight-desktop no sideways scroll",
+   "pass": true,
+   "detail": "page is 0px wider than the viewport"
+  },
+  {
+   "name": "weight-desktop rendered content",
+   "pass": true,
+   "detail": "3015 characters in main"
+  },
+  {
+   "name": "loot-desktop no console errors",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "loot-desktop no sideways scroll",
+   "pass": true,
+   "detail": "page is 0px wider than the viewport"
+  },
+  {
+   "name": "loot-desktop rendered content",
+   "pass": true,
+   "detail": "11113 characters in main"
+  },
+  {
+   "name": "data-desktop no console errors",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "data-desktop no sideways scroll",
+   "pass": true,
+   "detail": "page is 0px wider than the viewport"
+  },
+  {
+   "name": "data-desktop rendered content",
+   "pass": true,
+   "detail": "1244 characters in main"
+  },
+  {
+   "name": "home-phone no console errors",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "home-phone no sideways scroll",
+   "pass": true,
+   "detail": "page is 0px wider than the viewport"
+  },
+  {
+   "name": "home-phone rendered content",
+   "pass": true,
+   "detail": "1624 characters in main"
+  },
+  {
+   "name": "hideout-phone no console errors",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "hideout-phone no sideways scroll",
+   "pass": true,
+   "detail": "page is 0px wider than the viewport"
+  },
+  {
+   "name": "hideout-phone rendered content",
+   "pass": true,
+   "detail": "31796 characters in main"
+  },
+  {
+   "name": "loadout-phone no console errors",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "loadout-phone no sideways scroll",
+   "pass": true,
+   "detail": "page is 0px wider than the viewport"
+  },
+  {
+   "name": "loadout-phone rendered content",
+   "pass": true,
+   "detail": "8398 characters in main"
+  },
+  {
+   "name": "weight-phone no console errors",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "weight-phone no sideways scroll",
+   "pass": true,
+   "detail": "page is 0px wider than the viewport"
+  },
+  {
+   "name": "weight-phone rendered content",
+   "pass": true,
+   "detail": "3015 characters in main"
+  },
+  {
+   "name": "loot-phone no console errors",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "loot-phone no sideways scroll",
+   "pass": true,
+   "detail": "page is 0px wider than the viewport"
+  },
+  {
+   "name": "loot-phone rendered content",
+   "pass": true,
+   "detail": "11113 characters in main"
+  },
+  {
+   "name": "data-phone no console errors",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "data-phone no sideways scroll",
+   "pass": true,
+   "detail": "page is 0px wider than the viewport"
+  },
+  {
+   "name": "data-phone rendered content",
+   "pass": true,
+   "detail": "1244 characters in main"
+  },
+  {
+   "name": "ranks survive reload",
+   "pass": true,
+   "detail": "Turncoat select reads 2"
+  },
+  {
+   "name": "hideout tick survives reload",
+   "pass": true
+  },
+  {
+   "name": "run tick survives reload",
+   "pass": true
+  },
+  {
+   "name": "built tick moves Next build on",
+   "pass": true,
+   "detail": "Next build: GeneratorTiger Bay -> Next build: Salvaged Wooden CrateUnlocks"
+  },
+  {
+   "name": "named loadout survives reload",
+   "pass": true,
+   "detail": "Check loadoutAK-12, LVS Tactical (Multicam), 5.45x39mm BP (7N22) · saved 2026-10"
+  },
+  {
+   "name": "loadout draft survives reload",
+   "pass": true
+  },
+  {
+   "name": "typed price survives reload",
+   "pass": true
+  },
+  {
+   "name": "loadout totals rendered",
+   "pass": true,
+   "detail": "12.95 kgWeight worn$12,345Cost, 1 unpriced0Carry slots (rig, carrier, pack)1Locked at your ranks"
+  },
+  {
+   "name": "run bag lands in the weight tool and survives reload",
+   "pass": true,
+   "detail": "no wiki pictureSteel4x24.4 kg4.4 kg8RemoveMotor Oil2x24.3 kg4.3 kg4Removeno wiki pictureMechanical P"
+  },
+  {
+   "name": "weight total includes loadout and bag",
+   "pass": true,
+   "detail": "12.95 kgWorn incl. 120 rounds10.7 kgCarried out23.65 kgTotal30.35 kgRoom before 54 kg"
+  },
+  {
+   "name": "clear empties storage",
+   "pass": true,
+   "detail": "null"
+  },
+  {
+   "name": "export -> clear -> import gives the same state",
+   "pass": true,
+   "detail": "569 chars before, 569 after"
+  },
+  {
+   "name": "imported state survives reload",
+   "pass": true,
+   "detail": "2 vendor ranks, 1 hideout ticks, 1 runs done, 0 owned items, 1 prices, 1 saved loadouts, 4 bag lines."
+  },
+  {
+   "name": "a foreign file is refused",
+   "pass": true,
+   "detail": "Not imported: This is not a GZW Toolkit export."
+  }
+ ]
+}
